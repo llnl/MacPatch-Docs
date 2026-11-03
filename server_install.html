@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="img/favicon.ico" />
-    <title>Server Install & Setup - MacPatch v3.8.x</title>
+    <title>Server Install & Setup - MacPatch v4.4.x Documentation</title>
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -31,7 +31,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-          <a href="index.html" class="icon icon-home"> MacPatch v3.8.x
+          <a href="index.html" class="icon icon-home"> MacPatch v4.4.x Documentation
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
@@ -70,7 +70,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#configure-server-software">Configure Server Software</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#configure-macpatch-schema-populate-default-data">Configure MacPatch schema &amp; populate default data</a>
+    <li class="toctree-l3"><a class="reference internal" href="#database-setup-upgrades">Database Setup &amp; Upgrades</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#start-configured-services">Start Configured Services</a>
     </li>
@@ -123,11 +123,9 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" >OS Management</a>
     <ul>
-                <li class="toctree-l2"><a class="reference internal" href="sw_restrictions.html">Software Restrictions</a>
+                <li class="toctree-l2"><a class="reference internal" href="profiles.html">Profiles</a>
                 </li>
     </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="provisioning.html">Provisioning</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">About</span></p>
@@ -142,7 +140,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
       <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">MacPatch v3.8.x</a>
+          <a href="index.html">MacPatch v4.4.x Documentation</a>
         
       </nav>
       <div class="wy-nav-content">
@@ -162,7 +160,7 @@
                 <h2 id="table-of-contents">Table of Contents</h2>
 <ul>
 <li><a href="#table-of-contents">Table of Contents</a><ul>
-<li><a href="#prequisits--requirements">Prequisits &amp; Requirements</a><ul>
+<li><a href="#prequisits--requirements">Prequisits \&amp; Requirements</a><ul>
 <li><a href="#requirements-">Requirements </a></li>
 <li><a href="#perquisites-">Perquisites </a></li>
 <li><a href="#linux-packages-">Linux Packages </a></li>
@@ -173,19 +171,19 @@
 <li><a href="#install-software-">Install Software </a></li>
 <li><a href="#setup-database-">Setup Database </a></li>
 <li><a href="#configure-server-software-">Configure Server Software </a></li>
-<li><a href="#configure-macpatch-schema--populate-default-data-">Configure MacPatch schema &amp; populate default data </a></li>
+<li><a href="#database-setup--upgrades-">Database Setup \&amp; Upgrades </a></li>
 <li><a href="#start-configured-services">Start Configured Services</a></li>
 <li><a href="#stop-configured-services">Stop Configured Services</a></li>
 </ul>
 </li>
-<li><a href="#server-setup--configuration-">Server Setup &amp; Configuration </a><ul>
+<li><a href="#server-setup--configuration-">Server Setup \&amp; Configuration </a><ul>
 <li><a href="#first-login-">First Login </a></li>
 <li><a href="#server-configuration-">Server Configuration </a></li>
 <li><a href="#default-patch-group-configuration-">Default Patch Group Configuration </a></li>
 <li><a href="#client-agent-configuration-">Client Agent Configuration </a></li>
 </ul>
 </li>
-<li><a href="#download--add-patch-content-">Download &amp; Add Patch Content </a></li>
+<li><a href="#download--add-patch-content-">Download \&amp; Add Patch Content </a></li>
 </ul>
 </li>
 </ul>
@@ -247,14 +245,25 @@ dnf install epel-release pcre-devel swig
 <pre><code>    cd /opt/MacPatch/Server/conf/scripts/setup
     sudo ./ServerSetup.py --setup
 </code></pre>
-<h5 id="configure-macpatch-schema-populate-default-data">Configure MacPatch schema &amp; populate default data <a name='a3f'></a></h5>
-<pre><code>    cd /opt/MacPatch/Server/apps/console/mpconsole
-    source /opt/MacPatch/Server/env/console/bin/activate
-    flask db upgrade head
-    /opt/MacPatch/Server/apps/mpsetup.py --populate-db
-    deactivate
+<p>The setup script will walk you through the following:</p>
+<ol>
+<li>Server keys and default configuration.</li>
+<li>Database settings, use the database account name and password from the database setup step.</li>
+<li>LDAP/Active Directory login settings (optional).</li>
+<li>Database schema &amp; default data. The MacPatch database schema is created and the default data (patch group, software group, client group, agent configuration, etc.) is added.</li>
+<li>First admin account. If no admin account exists you will be asked to create one. Enter an account name (default is "mpadmin") and a password, or leave the password blank to have a strong password generated for you.</li>
+<li>Services to enable.</li>
+</ol>
+<p><strong>Important:</strong> The admin password is only displayed once, please save it in a secure location. It can not be recovered.</p>
+<h5 id="database-setup-upgrades">Database Setup &amp; Upgrades <a name='a3e'></a></h5>
+<p>If the database step was skipped during "--setup" or failed (e.g. the database was not reachable), it can be run on its own. This is also used to upgrade the database schema after updating the MacPatch software. It is safe to run more than once, existing data is not changed.</p>
+<pre><code>    cd /opt/MacPatch/Server/conf/scripts/setup
+    sudo ./ServerSetup.py --setup-db
 </code></pre>
-<p><strong>Note:</strong> If "flask db upgrade head" is done using a root shell. Please delete the "/opt/MacPatch/Server/logs/mpconsole.log" file. It will be owned by root and the REST api will not launch.</p>
+<p>To create an additional console admin account from the command line</p>
+<pre><code>    sudo ./ServerSetup.py --config admin
+</code></pre>
+<p><strong>Note:</strong> These commands run as the MacPatch service user (www-data on Linux, _appserver on Mac), there is no need to run them in the console virtual environment.</p>
 <h5 id="start-configured-services">Start Configured Services</h5>
 <pre><code>    cd /opt/MacPatch/Server/conf/scripts/setup
     sudo ./ServerSetup.py --service All --action start
@@ -267,27 +276,19 @@ dnf install epel-release pcre-devel swig
 <h3 id="server-setup-configuration">Server Setup &amp; Configuration <a name='a4'></a></h3>
 <p>The MacPatch server software has now been installed and should be up and running. The server is almost ready for accepting clients. There are a few more server configuration settings which need to be configured.</p>
 <h4 id="first-login">First Login <a name='a4a'></a></h4>
-<p>The default user name is “mpadmin” and the password is “*mpadmin*”, Unless it was changed using the “ServerSetup.py” script. You will need to login for the first time with this account to do all of the setup tasks. Once these tasks are completed it’s recommended that this account be disabled. This can be done by editing the <strong>siteconfig.json</strong> file, which is located in /opt/MacPatch/Server/etc/.</p>
-<p><strong>From:</strong></p>
-<pre>
-`"users": {
-    "admin": {
-        "enabled": true,
-        "name": "mpadmin",
-        "pass": "*mpadmin*"
-    }
-}`
-</pre>
-<p><strong>To:</strong></p>
-<pre>
-`"users": {
-    "admin": {
-        "enabled": false,
-        "name": "mpadmin",
-        "pass": "*mpadmin*"
-    }
-}`
-</pre>
+<p>Login using the admin account and password created during “ServerSetup.py --setup”. You will need to login for the first time with this account to do all of the setup tasks.</p>
+<p>There is no longer a default admin password, and the admin account is no longer stored in the <strong>siteconfig.json</strong> file. Admin accounts are stored in the MacPatch database with a hashed password.</p>
+<p>Once these tasks are completed and other admin accounts have been created, it’s recommended that this account be disabled.</p>
+<ul>
+<li>Go to “Admin -&gt; Accounts”</li>
+<li>Edit the account and set “Enabled” to “No”</li>
+</ul>
+<p>If the admin password is lost, it can be reset from the command line. The account is recreated with admin rights and a new password is generated and displayed.</p>
+<pre><code>    cd /opt/MacPatch/Server/apps/console/scripts
+    sudo -u www-data /opt/MacPatch/Server/env/console/bin/python3 create_admin_account.py --username mpadmin --force
+</code></pre>
+<p>On Mac use “_appserver” instead of “www-data”.</p>
+<p><strong>Upgrading from an older version:</strong> If your <strong>siteconfig.json</strong> still contains a “users” -&gt; “admin” account, it is no longer used. Create a database admin account with “sudo ./ServerSetup.py --config admin” and then remove the “users” section from <strong>siteconfig.json</strong>.</p>
 <h4 id="server-configuration">Server Configuration <a name='a4b'></a></h4>
 <p>Each MacPatch server needs to be added to the environment. The master server is always added automatically.</p>
 <p>It is recommended that you login and verify the master server settings. It is common during install that the master server address will be added as localhost or 127.0.0.1. Please make sure that the correct hostname or IP address is set and that <strong>"active"</strong> is enabled.</p>

@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="img/favicon.ico" />
-    <title>Apple Patches - MacPatch v3.8.x</title>
+    <title>Apple Patches - MacPatch v4.4.x Documentation</title>
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -31,7 +31,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-          <a href="index.html" class="icon icon-home"> MacPatch v3.8.x
+          <a href="index.html" class="icon icon-home"> MacPatch v4.4.x Documentation
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
@@ -79,11 +79,9 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" >OS Management</a>
     <ul>
-                <li class="toctree-l2"><a class="reference internal" href="sw_restrictions.html">Software Restrictions</a>
+                <li class="toctree-l2"><a class="reference internal" href="profiles.html">Profiles</a>
                 </li>
     </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="provisioning.html">Provisioning</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">About</span></p>
@@ -98,7 +96,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
       <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">MacPatch v3.8.x</a>
+          <a href="index.html">MacPatch v4.4.x Documentation</a>
         
       </nav>
       <div class="wy-nav-content">
@@ -118,12 +116,12 @@
               
                 <p><a name='a1'></a>Apple patch content in MacPatch is collected from the Apple Software Update servers. Every patch apple offers is processed and posted to the MacPatch database via the <code>MPSUSPatchSync.py</code> script. This script is run on a 8 hour interval by default. By default all new apple patches will show up in the database with it's patch state set to "Create". In order for a patch to install it's state needs to be changed to "QA" or "Production".</p>
 <p><strong>Example - Apple patch in <code>Create</code> state</strong></p>
-<p><a href="images/content/apple1.png"><img alt="" src="images/content/apple1.png" /></a></p>
+<p><a href="./images/content/apple1.png"><img alt="" src="./images/content/apple1.png" /></a></p>
 <h4 id="extending-an-apple-patch">Extending an Apple Patch <a name='a2'></a></h4>
 <p>MacPatch offers the ability to enhance and extend apple supplied patches. MacPatch offers the ability to change the order in which the patch is installed. This is done with the "Patch Install Weight"; the lower the number the sooner the install. By default custom patches have an install weight of 30 and apple patches have an install weight of 60. You also have the ability to override the reboot setting as well. For example if you have an apple patch that does not require a reboot you can change it so it does and vice versa.</p>
-<p><a href="images/content/apple2.png"><img alt="" src="images/content/apple2.png" /></a></p>
+<p><a href="./images/content/apple2.png"><img alt="" src="./images/content/apple2.png" /></a></p>
 <p>The final option to extending an apple patch is being able to assign and pre and post install script.</p>
-<p><a href="images/content/apple3.png"><img alt="" src="images/content/apple3.png" /></a></p>
+<p><a href="./images/content/apple3.png"><img alt="" src="./images/content/apple3.png" /></a></p>
 <h3 id="testing-patch-content">Testing Patch Content <a name='a3'></a></h3>
 <p>The preferred method to testing new patches is once a patch has been created involves creating a new patch group and client group and changing the client setting for the new client group.</p>
 <ul>

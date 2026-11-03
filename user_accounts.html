@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="img/favicon.ico" />
-    <title>User Accounts - MacPatch v3.8.x</title>
+    <title>User Accounts - MacPatch v4.4.x Documentation</title>
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -31,7 +31,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-          <a href="index.html" class="icon icon-home"> MacPatch v3.8.x
+          <a href="index.html" class="icon icon-home"> MacPatch v4.4.x Documentation
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
@@ -69,6 +69,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#directory-accounts">Directory Accounts</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#azure-accounts">Azure Accounts</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#account-rights">Account Rights</a>
@@ -97,11 +99,9 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" >OS Management</a>
     <ul>
-                <li class="toctree-l2"><a class="reference internal" href="sw_restrictions.html">Software Restrictions</a>
+                <li class="toctree-l2"><a class="reference internal" href="profiles.html">Profiles</a>
                 </li>
     </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="provisioning.html">Provisioning</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">About</span></p>
@@ -116,7 +116,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
       <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">MacPatch v3.8.x</a>
+          <a href="index.html">MacPatch v4.4.x Documentation</a>
         
       </nav>
       <div class="wy-nav-content">
@@ -143,50 +143,68 @@
 <li><a href="#a2">User Accounts</a><ul>
 <li><a href="#a2a">Standard Accounts</a></li>
 <li><a href="#a2b">Directory Accounts</a></li>
+<li><a href="#a2c">Azure Accounts</a></li>
 </ul>
 </li>
 <li><a href="#a3">Account Rights</a></li>
 </ul>
 <h4 id="default-admin">Default Admin <a name='a1'></a></h4>
-<p>The default admin account is local to the MacPatch server. This account should only be used for setup of the MacPatch "Master" server. Once a load admin account has been created. It's recommended that the admin account be disabled.</p>
+<p>The default admin account is created during the server setup ("ServerSetup.py --setup"). It is a local account stored in the MacPatch database with a hashed password, there is no default password and the account is no longer stored in the <strong>siteconfig.json</strong> file.</p>
+<p>This account should only be used for setup of the MacPatch "Master" server. Once another admin account has been created, it's recommended that the default admin account be disabled.</p>
+<p>Additional admin accounts can be created from the command line on the MacPatch server.</p>
+<pre><code>cd /opt/MacPatch/Server/conf/scripts/setup
+sudo ./ServerSetup.py --config admin
+</code></pre>
 <h5 id="-change-default-admin-password">- Change Default Admin password</h5>
-<p><a name='a1a'></a>Changing the default admin account password requires editing the <strong>siteconfig.json</strong> file. This file is lcoated in "/opt/MacPatch/Server/etc/". Please note, the password is in clear text.</p>
+<p><a name='a1a'></a>The default admin password is reset from the command line on the MacPatch server. The account is recreated with admin rights and a new password is generated and displayed. Please save it in a secure location, it can not be recovered.</p>
+<pre><code>cd /opt/MacPatch/Server/apps/console/scripts
+sudo -u www-data /opt/MacPatch/Server/env/console/bin/python3 create_admin_account.py --username mpadmin --force
+</code></pre>
+<p>On Mac use "_appserver" instead of "www-data". To set a specific password instead of generating one add <code>--password "YourPassword"</code> (8 characters minimum).</p>
 <h5 id="-disable-default-admin-account">- Disable Default Admin account</h5>
-<p><a name='a1b'></a> Disabling the default requires editing the <strong>siteconfig.json</strong> file. This file is lcoated in "/opt/MacPatch/Server/etc/". To disable the account simply change the "enabled" key value to "false".</p>
-<p><strong>From:</strong></p>
-<pre>
-`"users": {
-    "admin": {
-        "enabled": true,
-        "name": "mpadmin",
-        "pass": "*mpadmin*"
-    }
-}`
-</pre>
-<p><strong>To:</strong></p>
-<pre>
-`"users": {
-    "admin": {
-        "enabled": false,
-        "name": "mpadmin",
-        "pass": "*mpadmin*"
-    }
-}`
-</pre>
-
+<p><a name='a1b'></a>To disable the default admin account, navigate to the Admin-&gt;Accounts menu, edit the account and set "Enabled" to "No".</p>
+<p><strong>Upgrading from an older version:</strong> If your <strong>siteconfig.json</strong> still contains a "users" -&gt; "admin" account, it is no longer used and can be removed.</p>
 <h4 id="user-accounts">User Accounts <a name='a2'></a></h4>
-<p>MacPatch supports 2 different accounts not including the default admin account. MacPatch supports standard database accounts and LDAP/Active Directory accounts.</p>
+<p>MacPatch supports 3 different account types not including the default admin account. MacPatch supports standard database accounts, LDAP/Active Directory accounts and Azure (Microsoft Entra ID) accounts.</p>
 <p><a name='a2a'></a></p>
 <h5 id="local-accounts">Local Accounts</h5>
 <p>To add or remove a standard account, navigate to the Admin-&gt;Accounts menu. Simply click on the "+" icon just above the accounts table.</p>
 <p>Assiging rights to a user account is fairly straight forward. If no rights are assigned the user can login and create a Client group and a patch group. This user will also be the owner of these groups and can assign additional users who can assist in managing these options.</p>
 <p><a name='a2b'></a></p>
 <h5 id="directory-accounts">Directory Accounts</h5>
-<p>MacPatch supports user accounts coming from LDAP/Active directory. During the server setup you were asked if you wanted to enable LDAP user support. If you answered "Yes", then all of your settings were entered in to the "siteconfig.json" file. The settings are under the "ldap" key.</p>
-<p>By default any user in the directory is allowed to login to MacPatch. This user will have the basic standard user rights. If you wish to limit directory users who can log in to the MacPatch admin console you will need to populate to keys in the "ldap" dictiobnary. First you will need to enable the "enableGroupFilter" attribute by setting it to "true". Then you will need to edit the "groupFilter" attribute. This attribute is a list, and is just the name the LDAP group.</p>
-<p>Example:
-<code>"groupFilter": ['Group1', 'Group2']</code></p>
+<p>MacPatch supports user accounts coming from LDAP/Active directory. During the server setup you were asked if you wanted to enable LDAP user support. If you answered "Yes", then your settings were saved to the "/opt/MacPatch/Server/apps/.mpglobal" file (the "LDAP_SRVC_" settings). To change the settings run:</p>
+<pre><code>cd /opt/MacPatch/Server/conf/scripts/setup
+sudo ./ServerSetup.py --config ldap
+</code></pre>
+<p>Any user in the directory is allowed to login to MacPatch. This user will have the basic standard user rights.</p>
 <p>Assiging rights to ldap users is just like a standard account. The only difference is the user has to login at least one time so that the user will show in the accounts table.</p>
+<p><a name='a2c'></a></p>
+<h5 id="azure-accounts">Azure Accounts</h5>
+<p>MacPatch supports user accounts from Azure (Microsoft Entra ID) using the Microsoft Authentication Library (MSAL). Users sign in with the "Login via Azure" button on the MacPatch console login page.</p>
+<p><strong>Register the application in Azure</strong></p>
+<ol>
+<li>In the Azure portal, go to "Microsoft Entra ID -&gt; App registrations" and create a new registration.</li>
+<li>Add a "Web" platform redirect URI: <code>https://&lt;your-macpatch-console-host&gt;/auth/signin-oidc</code></li>
+<li>Under "Certificates &amp; secrets", create a new client secret. Save the secret value, it is only shown once.</li>
+<li>Under "API permissions", make sure the Microsoft Graph "User.Read" (delegated) permission is granted.</li>
+<li>Note the "Application (client) ID" and the "Directory (tenant) ID".</li>
+</ol>
+<p><strong>Configure MacPatch</strong></p>
+<p>Add the following settings to the "/opt/MacPatch/Server/apps/.mpconsole" file, then restart the console service.</p>
+<pre><code>MSAL_CLIENT_ID=&lt;Application (client) ID&gt;
+MSAL_CLIENT_SECRET=&lt;client secret value&gt;
+MSAL_AUTHORITY=https://login.microsoftonline.com/&lt;Directory (tenant) ID&gt;
+MSAL_HTTP_SCHEME=https
+
+cd /opt/MacPatch/Server/conf/scripts/setup
+sudo ./ServerSetup.py --service MPConsole --action stop
+sudo ./ServerSetup.py --service MPConsole --action start
+</code></pre>
+<p>"MSAL_AUTHORITY" must be the full authority URL, not just the tenant ID. "MSAL_HTTP_SCHEME" should always be "https" in production.</p>
+<p><strong>Login &amp; Rights</strong></p>
+<p>The MacPatch user name is the part of the Azure user name before the "@", e.g. "jdoe@example.com" will be "jdoe" in MacPatch. If a local or LDAP account with the same name exists, it is the same MacPatch account.</p>
+<p>The account is created on the first login with no rights. Assiging rights to Azure users is just like a standard account, the user has to login at least one time so that the user will show in the accounts table. Azure app roles are not used, all rights are assigned in MacPatch.</p>
+<p>To allow only Azure logins, add <code>LOCAL_AUTH_ALLOWED=no</code> to the "/opt/MacPatch/Server/apps/.mpconsole" file and restart the console service. This hides the "Login via MacPatch" button and disables local and LDAP logins, including the default admin account. Make sure at least one Azure account has been given admin rights first.</p>
 <h4 id="account-rights">Account Rights <a name='a3'></a></h4>
 <table>
 <thead>
