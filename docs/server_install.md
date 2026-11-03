@@ -9,7 +9,7 @@
 		- [Install Software ](#install-software-)
 		- [Setup Database ](#setup-database-)
 		- [Configure Server Software ](#configure-server-software-)
-		- [Configure MacPatch schema \& populate default data ](#configure-macpatch-schema--populate-default-data-)
+		- [Database Setup \& Upgrades ](#database-setup--upgrades-)
 		- [Start Configured Services](#start-configured-services)
 		- [Stop Configured Services](#stop-configured-services)
 	- [Server Setup \& Configuration ](#server-setup--configuration-)
@@ -84,15 +84,29 @@ It's strongly recommended that you delete the sql script once run. The file won'
 		cd /opt/MacPatch/Server/conf/scripts/setup
 		sudo ./ServerSetup.py --setup
 
-##### Configure MacPatch schema & populate default data <a name='a3f'></a>
+The setup script will walk you through the following:
 
-		cd /opt/MacPatch/Server/apps
-		source ../env/console/bin/activate
-		flask db upgrade head
-		/opt/MacPatch/Server/apps/mpsetup.py --populate-db
-		deactivate
+1. Server keys and default configuration.
+2. Database settings, use the database account name and password from the database setup step.
+3. LDAP/Active Directory login settings (optional).
+4. Database schema & default data. The MacPatch database schema is created and the default data (patch group, software group, client group, agent configuration, etc.) is added.
+5. First admin account. If no admin account exists you will be asked to create one. Enter an account name (default is "mpadmin") and a password, or leave the password blank to have a strong password generated for you.
+6. Services to enable.
 
-**Note:** If "flask db upgrade head" is done using a root shell. Please delete the "/opt/MacPatch/Server/logs/mpconsole.log" file. It will be owned by root and the REST api will not launch.
+**Important:** The admin password is only displayed once, please save it in a secure location. It can not be recovered.
+
+##### Database Setup & Upgrades <a name='a3e'></a>
+
+If the database step was skipped during "--setup" or failed (e.g. the database was not reachable), it can be run on its own. This is also used to upgrade the database schema after updating the MacPatch software. It is safe to run more than once, existing data is not changed.
+
+		cd /opt/MacPatch/Server/conf/scripts/setup
+		sudo ./ServerSetup.py --setup-db
+
+To create an additional console admin account from the command line
+
+		sudo ./ServerSetup.py --config admin
+
+**Note:** These commands run as the MacPatch service user (www-data on Linux, _appserver on Mac), there is no need to run them in the console virtual environment.
 
 ##### Start Configured Services
 
@@ -111,28 +125,23 @@ It's strongly recommended that you delete the sql script once run. The file won'
 The MacPatch server software has now been installed and should be up and running. The server is almost ready for accepting clients. There are a few more server configuration settings which need to be configured.
 
 #### First Login <a name='a4a'></a>
-The default user name is “mpadmin” and the password is “\*mpadmin\*”, Unless it was changed using the “ServerSetup.py” script. You will need to login for the first time with this account to do all of the setup tasks. Once these tasks are completed it’s recommended that this account be disabled. This can be done by editing the **siteconfig.json** file, which is located in /opt/MacPatch/Server/etc/.
+Login using the admin account and password created during “ServerSetup.py --setup”. You will need to login for the first time with this account to do all of the setup tasks.
 
-**From:**
-<pre>
-`"users": {
-    "admin": {
-        "enabled": true,
-        "name": "mpadmin",
-        "pass": "*mpadmin*"
-    }
-}`
-</pre>
-**To:**
-<pre>
-`"users": {
-    "admin": {
-        "enabled": false,
-        "name": "mpadmin",
-        "pass": "*mpadmin*"
-    }
-}`
-</pre>
+There is no longer a default admin password, and the admin account is no longer stored in the **siteconfig.json** file. Admin accounts are stored in the MacPatch database with a hashed password.
+
+Once these tasks are completed and other admin accounts have been created, it’s recommended that this account be disabled.
+
+* Go to “Admin -> Accounts”
+* Edit the account and set “Enabled” to “No”
+
+If the admin password is lost, it can be reset from the command line. The account is recreated with admin rights and a new password is generated and displayed.
+
+		cd /opt/MacPatch/Server/apps/console/scripts
+		sudo -u www-data /opt/MacPatch/Server/env/console/bin/python3 create_admin_account.py --username mpadmin --force
+
+On Mac use “_appserver” instead of “www-data”.
+
+**Upgrading from an older version:** If your **siteconfig.json** still contains a “users” -> “admin” account, it is no longer used. Create a database admin account with “sudo ./ServerSetup.py --config admin” and then remove the “users” section from **siteconfig.json**.
 #### Server Configuration <a name='a4b'></a>
 Each MacPatch server needs to be added to the environment. The master server is always added automatically.
 
